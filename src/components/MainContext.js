@@ -1,11 +1,18 @@
-import React, {useState, useEffect} from "react";
+import React, { useState } from "react";
 import DoneIcon from "../img/done.png";
 
 function MainContext({ newTodoText = 'What will you do?' }) {
 
+    // Hooks
     const [todos, setTodos] = useState([]);
     const [todo, setTodo] = useState(null);
 
+    /**
+     *
+     * @param length
+     * @returns {string}
+     * @constructor
+     */
     const MakeId = (length = 8) => {
         let result = ''
             , characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
@@ -31,9 +38,57 @@ function MainContext({ newTodoText = 'What will you do?' }) {
         setTodos([...todos, newTodo]);
     }
 
-    useEffect(() => {
-        console.log(todos)
-    }, [todos])
+    /**
+     *
+     * @param _t
+     * @param status
+     */
+    const editTodo = (_t, status) => {
+        let newValue = prompt(newTodoText)
+            , clickedTodo = todos.find(todo => todo.id === _t.id);
+
+        setTodos([...todos, {
+            id: MakeId(),
+            status: status,
+            textContent: newValue,
+            deleted: 0,
+            removed: 0
+        }])
+
+        clickedTodo.deleted = 1;
+    }
+
+    /**
+     *
+     * @param todoID
+     */
+    const deleteTodo = (todoID) => {
+        let clickedTodo = todos.find(todo => todo.id === todoID);
+
+        setTodos([...todos]);
+
+        clickedTodo.removed = 1;
+        clickedTodo.deleted = 1;
+    }
+
+    /**
+     *
+     * @param _t
+     * @param changeTo
+     */
+    const changeStatus = (_t, changeTo) => {
+        let clickedTodo = todos.find(todo => todo.id === _t.id);
+
+        setTodos([...todos, {
+            id: MakeId(),
+            status: changeTo,
+            textContent: clickedTodo.textContent,
+            deleted: 0,
+            removed: 0
+        }]);
+
+        clickedTodo.deleted = 1;
+    }
 
     return(
         <>
@@ -44,10 +99,7 @@ function MainContext({ newTodoText = 'What will you do?' }) {
                            placeholder={newTodoText}
                            onChange={(e) => setTodo(e.target.value.trim())}/>
                     <button type="button"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                addTodo();
-                            }}>Create Todo</button>
+                            onClick={() => addTodo()}>Create Todo</button>
                 </form>
 
                 {todos.length > 0 ? (
@@ -63,54 +115,19 @@ function MainContext({ newTodoText = 'What will you do?' }) {
                                                 <button type="button"
                                                         title="Edit this to-do"
                                                         className="icon-btn"
-                                                        onClick={e => {
-                                                            e.preventDefault()
-
-                                                            let newValue = prompt(newTodoText)
-                                                                , clickedTodo = todos.find(todo => todo.id === _todo.id);
-
-                                                            setTodos([...todos, {
-                                                                id: MakeId(),
-                                                                status: 1,
-                                                                textContent: newValue,
-                                                                deleted: 0,
-                                                                removed: 0
-                                                            }])
-
-                                                            clickedTodo.deleted = 1;
-
-                                                        }}>
+                                                        onClick={() => editTodo(_todo, 1)}>
                                                     <span className="material-symbols-outlined">edit</span>
                                                 </button>
                                                 <button type="button"
                                                         title="Delete this to-do"
                                                         className="icon-btn delete"
-                                                        onClick={() => {
-                                                            let clickedTodo = todos.find(todo => todo.id === _todo.id);
-
-                                                            setTodos([...todos]);
-
-                                                            clickedTodo.removed = 1;
-                                                            clickedTodo.deleted = 1;
-                                                        }}>
+                                                        onClick={() => deleteTodo(_todo.id)}>
                                                     <span className="material-symbols-outlined">delete</span>
                                                 </button>
                                             </div>
                                             <button type="button"
                                                     className="right-btn"
-                                                    onClick={() => {
-                                                        let clickedTodo = todos.find(todo => todo.id === _todo.id);
-
-                                                        setTodos([...todos, {
-                                                            id: MakeId(),
-                                                            status: 2,
-                                                            textContent: clickedTodo.textContent,
-                                                            deleted: 0,
-                                                            removed: 0
-                                                        }]);
-
-                                                        clickedTodo.deleted = 1;
-                                                    }}>Mark as doing</button>
+                                                    onClick={() => changeStatus(_todo, 2)}>Mark as doing</button>
                                         </div>
                                     </li>
                                 ) : '')}
@@ -127,53 +144,18 @@ function MainContext({ newTodoText = 'What will you do?' }) {
                                                 <div className="icon-buttons">
                                                     <button type="button"
                                                             className="icon-btn"
-                                                            onClick={e => {
-                                                                e.preventDefault()
-
-                                                                let newValue = prompt(newTodoText)
-                                                                    , clickedTodo = todos.find(todo => todo.id === _todo.id);
-
-                                                                setTodos([...todos, {
-                                                                    id: MakeId(),
-                                                                    status: 2,
-                                                                    textContent: newValue,
-                                                                    deleted: 0,
-                                                                    removed: 0
-                                                                }])
-
-                                                                clickedTodo.deleted = 1;
-
-                                                            }}>
+                                                            onClick={() => editTodo(_todo, 2)}>
                                                         <span className="material-symbols-outlined">edit</span>
                                                     </button>
                                                     <button type="button"
                                                             className="icon-btn delete"
-                                                            onClick={() => {
-                                                                let clickedTodo = todos.find(todo => todo.id === _todo.id);
-
-                                                                setTodos([...todos]);
-
-                                                                clickedTodo.removed = 1;
-                                                                clickedTodo.deleted = 1;
-                                                            }}>
+                                                            onClick={() => deleteTodo(_todo.id)}>
                                                         <span className="material-symbols-outlined">delete</span>
                                                     </button>
                                                 </div>
                                                 <button type="button"
                                                         className="right-btn"
-                                                        onClick={() => {
-                                                            let clickedTodo = todos.find(todo => todo.id === _todo.id);
-
-                                                            setTodos([...todos, {
-                                                                id: MakeId(),
-                                                                status: 3,
-                                                                textContent: clickedTodo.textContent,
-                                                                deleted: 0,
-                                                                removed: 0
-                                                            }]);
-
-                                                            clickedTodo.deleted = 1;
-                                                        }}>Mark as done</button>
+                                                        onClick={() => changeStatus(_todo, 3)}>Mark as done</button>
                                             </div>
                                         </li>
                                     </>
@@ -190,13 +172,9 @@ function MainContext({ newTodoText = 'What will you do?' }) {
                                             <div className="icon-buttons">
                                                 <button type="button"
                                                         className="icon-btn delete done-delete"
-                                                        onClick={() => {
-                                                            let clickedTodo = todos.find(todo => todo.id === _todo.id);
-
-                                                            setTodos([...todos]);
-
-                                                            clickedTodo.removed = 1;
-                                                            clickedTodo.deleted = 1;
+                                                        onClick={e => {
+                                                            e.preventDefault();
+                                                            deleteTodo(_todo.id);
                                                         }}>
                                                     <span className="material-symbols-outlined">delete</span> Delete
                                                 </button>
